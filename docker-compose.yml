@@ -1,0 +1,9 @@
+version: "3"
+
+services:
+  backup:
+    image: kopiro/backup
+    build: .
+    env_file: .env
+    volumes:
+      - .:/data

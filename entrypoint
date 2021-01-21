@@ -1,0 +1,9 @@
+#!/bin/sh
+set | grep "BACKUP_" > /etc/environment
+set | grep "AWS_" >> /etc/environment
+
+BACKUP_CRON_SCHEDULE=${BACKUP_CRON_SCHEDULE:-"@daily"}
+echo "BACKUP_CRON_SCHEDULE: $BACKUP_CRON_SCHEDULE"
+
+echo "$BACKUP_CRON_SCHEDULE /usr/bin/run" > /var/spool/cron/crontabs/root
+/usr/sbin/crond -f

@@ -1,0 +1,31 @@
+#!/bin/sh
+set -ex
+
+if [ ! -d "/data" ]; then
+  echo "Please mount a directory to backup with -v /path/to/your/dir:/data"
+  exit 1
+fi
+
+if [ -z "$BACKUP_BUCKET_NAME" ]; then
+  echo "Please set the bucket name"
+  exit 1
+fi
+
+if [ -z "$BACKUP_NAME" ]; then
+  echo "Please set the backup name"
+  exit 1
+fi
+
+_date=$(date -u +"%Y-%m-%d")
+_time=$(date -u +"%T")
+/bin/tar -czf - /data | \
+  aws s3 cp - \
+  "s3://${BACKUP_BUCKET_NAME}/${_date}/${BACKUP_NAME}-${_time}.tgz" \
+  --storage-class GLACIER
+
+# shellcheck disable=SC2181
+if [ $? -eq 0 ]; then
+  echo "$timestamp: The backup for $BACKUP_NAME finished successfully."
+else
+  echo "Backup of $TARGET has failed. Please look into this and find out what went wrong"
+fi
