@@ -1,5 +1,4 @@
 #!/bin/sh
-set -ex
 
 if [ ! -d "/data" ]; then
   echo "Please mount a directory to backup with -v /path/to/your/dir:/data"
@@ -16,16 +15,19 @@ if [ -z "$BACKUP_NAME" ]; then
   exit 1
 fi
 
+echo "Preparing backup..."
+
 _date=$(date -u +"%Y-%m-%d")
 _time=$(date -u +"%T")
+_name="s3://${BACKUP_BUCKET_NAME}/${_date}/${BACKUP_NAME}-${_time}.tgz"
 /bin/tar -czf - /data | \
   aws s3 cp - \
-  "s3://${BACKUP_BUCKET_NAME}/${_date}/${BACKUP_NAME}-${_time}.tgz" \
+  "$_name" \
   --storage-class GLACIER
 
 # shellcheck disable=SC2181
 if [ $? -eq 0 ]; then
-  echo "$timestamp: The backup for $BACKUP_NAME finished successfully."
+  echo "The backup called $_name has been uploaded"
 else
-  echo "Backup of $TARGET has failed. Please look into this and find out what went wrong"
+  echo "Backup failed"
 fi
