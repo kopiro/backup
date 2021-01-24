@@ -16,3 +16,17 @@ services:
     volumes:
       - /your/dir/to/backup:/data
 ```
+
+## time-off backup
+
+If you want to run a one-shot backup, do:
+
+```sh
+docker-compose exec -it backup run
+```
+
+### testing locally
+
+```sh
+docker-compose up --build -d
+```

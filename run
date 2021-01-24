@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -exu
+
 if [ ! -d "/data" ]; then
   echo "Please mount a directory to backup with -v /path/to/your/dir:/data"
   exit 1
@@ -20,7 +22,7 @@ echo "Preparing backup..."
 _date=$(date -u +"%Y-%m-%d")
 _time=$(date -u +"%T")
 _name="s3://${BACKUP_BUCKET_NAME}/${_date}/${BACKUP_NAME}-${_time}.tgz"
-/bin/tar -czf - /data | \
+/bin/tar -cvzf - /data | \
   aws s3 cp - \
   "$_name" \
   --storage-class GLACIER
